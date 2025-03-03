@@ -1,0 +1,173 @@
+﻿@{
+    ViewData["Title"] = "Tic Tac Toe Game";
+}
+
+<h1>Tic Tac Toe</h1>
+
+<div class="game-container">
+    <div class="inpt-btn">
+    <label>Player X Name: <input type="text" id="playerX" placeholder="Enter Player X Name" required></label>
+    <label>Player O Name: <input type="text" id="playerO" placeholder="Enter Player O Name" required></label>
+    <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div id="board" class="hidden">
+        <div class="cell" onclick="makeMove(0)"></div>
+        <div class="cell" onclick="makeMove(1)"></div>
+        <div class="cell" onclick="makeMove(2)"></div>
+        <div class="cell" onclick="makeMove(3)"></div>
+        <div class="cell" onclick="makeMove(4)"></div>
+        <div class="cell" onclick="makeMove(5)"></div>
+        <div class="cell" onclick="makeMove(6)"></div>
+        <div class="cell" onclick="makeMove(7)"></div>
+        <div class="cell" onclick="makeMove(8)"></div>
+    </div>
+
+    <div class="show-msg">
+    <h2 id="status">Enter names and click Start Game</h2>
+    <button id="restartBtn" class="hidden" onclick="resetGame()">Restart Game</button>
+    </div>
+</div>
+
+<style>
+    .game-container {
+        text-align: center;
+        margin-top: 20px;
+        display:flex;
+        width:100%;
+    }
+
+    .inpt-btn{
+        width: 33.33%;
+        display:flex;
+        flex-direction:column;
+    }
+
+    .show-msg{
+        font:1rem;
+        width: 33.33%;
+    }
+
+    label {
+        display: block;
+        margin: 10px;
+    }
+
+    input {
+        padding: 5px;
+        margin: 5px;
+    }
+
+    #status{
+        font-size:1.3rem;
+    }
+
+    button {
+        margin: 10px 0 0 40%;
+        padding: 5px 10px;
+        font-size: 16px;
+        cursor: pointer;
+        width:30%;
+        height:15%;
+       color:white;
+       font-weight:bold;
+       border:none;
+       border-radius:10px;
+        background-color:#278CDA;
+    }
+
+    #board {
+        display: grid;
+        grid-template-columns: repeat(3, 100px);
+        grid-template-rows: repeat(3, 100px);
+        gap: 5px;
+        width: 320px;
+        margin: 20px auto;
+    }
+
+    .cell {
+        width: 100px;
+        height: 100px;
+        background-color: #ddd;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2em;
+        cursor: pointer;
+    }
+
+        .cell:hover {
+            background-color: #bbb;
+        }
+
+    .hidden {
+        display: none;
+        width: 33.33%;
+    }
+</style>
+
+<script>
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let currentPlayer = "X";
+    let gameActive = false;
+    let playerXName = "";
+    let playerOName = "";
+
+    function startGame() {
+        playerXName = document.getElementById("playerX").value || "Player X";
+        playerOName = document.getElementById("playerO").value || "Player O";
+
+        document.getElementById("status").innerText = `${playerXName}'s Turn (X)`;
+        document.getElementById("board").classList.remove("hidden");
+        document.getElementById("restartBtn").classList.add("hidden");
+
+        gameActive = true;
+    }
+
+    function makeMove(index) {
+        if (!gameActive || board[index] !== "") return;
+
+        board[index] = currentPlayer;
+        document.getElementsByClassName("cell")[index].innerText = currentPlayer;
+        checkWinner();
+
+        if (gameActive) {
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            document.getElementById("status").innerText = `${currentPlayer === "X" ? playerXName : playerOName}'s Turn (${currentPlayer})`;
+        }
+    }
+
+    function checkWinner() {
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        for (let pattern of winPatterns) {
+            let [a, b, c] = pattern;
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                gameActive = false;
+                let winnerName = board[a] === "X" ? playerXName : playerOName;
+                document.getElementById("status").innerText = `🎉 Congratulations, ${winnerName} Wins! 🎉`;
+
+                setTimeout(resetGame, 5000); // Auto-reset after 3 seconds
+                return;
+            }
+        }
+
+        if (!board.includes("")) {
+            document.getElementById("status").innerText = "It's a Draw!";
+            gameActive = false;
+            setTimeout(resetGame, 3000);
+        }
+    }
+
+    function resetGame() {
+        board = ["", "", "", "", "", "", "", "", ""];
+        gameActive = true;
+        currentPlayer = "X";
+        document.getElementById("status").innerText = `${playerXName}'s Turn (X)`;
+        document.querySelectorAll(".cell").forEach(cell => cell.innerText = "");
+    }
+</script>
